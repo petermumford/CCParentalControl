@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "cocos2d.h"
-#import "BookData.h"
 #import "CCMenuItemImageWithTouches.h"
 
 @protocol CCParentalControlDelegate <NSObject>
@@ -18,24 +17,24 @@
 
 @interface CCParentalControl : CCLayer {
 	id <CCParentalControlDelegate> delegate;
-	
+
 	CCLayerColor *coverLayer;
 	CCSprite *dialog;
-	
+
 	CCLabelTTF *titleText;
 	CCLabelTTF *descriptionText;
 	CCSprite *resultText;
 	CCMenu *menuItems;
-	
+
 	NSString *spriteSheet;
 	NSString *returnURL;
-	
+
 	NSMutableArray *parentalArr;
-	
+
 	int randomlySelectedItem;
 	int counter;
 	int remainingAttempts;
-	
+
 	BOOL parentPassedTest;
 }
 

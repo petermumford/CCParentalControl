@@ -7,7 +7,6 @@
 //
 
 #import "CCParentalControl.h"
-#import "Sounds.h"
 #import "NSMutableArray+shuffling.h"
 
 
@@ -42,17 +41,17 @@
 	CCNode *dialogBox = [self getChildByTag: kDialogTag];
 	CCMenu *menu = (CCMenu*)[self getChildByTag:kDialogMenuTag];
 	CGRect menuRect = CGRectMake(menu.position.x, menu.position.y, menu.contentSize.width, menu.contentSize.height);
-	
+
 	if (CGRectContainsPoint(menuRect, touchLocation))
 		return NO;
-	
+
 	return (!CGRectContainsPoint(dialogBox.boundingBox, touchLocation));
 }
 
 -(void)registerWithTouchDispatcher
 {
 	CCTouchDispatcher *dispatcher = [[CCDirector sharedDirector] touchDispatcher];
-	
+
 	[dispatcher addTargetedDelegate: self
 												 priority: INT_MIN+1
 									swallowsTouches: YES];
@@ -81,7 +80,7 @@
 //	release objects here before super
 	[coverLayer release];
 	[dialog release];
-	
+
 	[super dealloc];
 }
 
@@ -108,40 +107,37 @@
 		parentPassedTest=NO;
 		remainingAttempts=3;
 		counter=0;
-		
+
 		spriteSheet = spriteSheetStr;
 		returnURL = urlStr;
 		[self loadUIGraphcs];
-		
+
 		NSDictionary *parentalDict = [[[NSDictionary alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"ParentalControl" ofType:@"plist"]] autorelease];
 		self.parentalArr = [[[NSMutableArray alloc] initWithArray:[parentalDict objectForKey:@"items"]] autorelease];
 		[self.parentalArr shuffleArray];
-		
+
 		self.coverLayer = [[ParentalCoverLayer new] autorelease]; // create the cover layer that "hides" the application in the background
 		[layer addChild:coverLayer z:INT_MAX-1]; // put to the very top to block application touches
 		[self.coverLayer runAction:[CCFadeTo actionWithDuration:OBJECTSFADEDURATION opacity:200]]; // smooth fade-in to dim with semi-transparency
 
 		CCMenuItemImage *closeBtn = [CCMenuItemImage itemWithNormalSprite:[CCSprite spriteWithSpriteFrameName:@"parental-close.png"] selectedSprite:nil block:^(id sender) {
-			if (![[BookData sharedData] returnIsSubMenuShowing])
-			{
-				[self closeParentalControl];
-			}
+			[self closeParentalControl];
 		}];
 		closeBtn.anchorPoint = ccp(0,0);
 
 		CCMenu *menu = [CCMenu menuWithItems:closeBtn, nil];
 		[menu setTag:kDialogMenuTag];
 		[menu setContentSize:CGSizeMake(closeBtn.contentSize.width, closeBtn.contentSize.height)];
-		menu.position = ccp(([CCDirector sharedDirector].winSize.width-closeBtn.contentSize.width)-[[BookData sharedData] halfIphone5],[CCDirector sharedDirector].winSize.height-closeBtn.contentSize.height);
+		menu.position = ccp(([CCDirector sharedDirector].winSize.width-closeBtn.contentSize.width),[CCDirector sharedDirector].winSize.height-closeBtn.contentSize.height);
 		[self.coverLayer addChild:menu];
-		
+
 		self.dialog = [CCSprite spriteWithSpriteFrameName:@"parental-background.png"];
 		self.dialog.tag = kDialogTag;
 		self.dialog.position = ccp(self.coverLayer.contentSize.width/2, self.coverLayer.contentSize.height/2);
 		self.dialog.scale = 0;
-		
+
 		[self setupScreen];
-		
+
 		[self.coverLayer addChild:self.dialog];
 		[dialog runAction:[CCEaseBackOut actionWithAction:[CCScaleTo actionWithDuration:OBJECTSFADEDURATION scale:1.0]]];
 	}
@@ -151,27 +147,27 @@
 -(void)setupScreen
 {
 	randomlySelectedItem = arc4random() % 4;
-	
+
 	NSString *title = [NSString string];
 	if (remainingAttempts == 3)
 		title = @"Are you a grown up?";
 	else
 		title = [NSString stringWithFormat:@"You have %@ goes remaining...", [self convertNumberToWords:remainingAttempts], nil];
-	
+
 	self.titleText = [CCLabelTTF labelWithString:title fontName:@"Verdana" fontSize:FONTSIZEIPAD];
 	[self.titleText setColor:ccBLACK];
 	[self.titleText setPosition:ccp(self.dialog.contentSize.width/2, (self.dialog.contentSize.height-titleTextY) )];
 	[self.dialog addChild:self.titleText];
-	
+
 	NSMutableArray *selectedItemsArr = [[[NSMutableArray alloc] init] autorelease];
 	for (int i=0; i<4; i++)
 	{
 		NSDictionary *dict = [[[NSDictionary alloc] initWithDictionary:[self.parentalArr objectAtIndex:i]] autorelease];
 		NSString *image = [NSString stringWithFormat:@"%@", [dict objectForKey:@"filename"], nil];
-		
+
 		CCMenuItemImageWithTouches *menuItem = [CCMenuItemImageWithTouches itemWithNormalSprite:[CCSprite spriteWithSpriteFrameName:image] selectedSprite:nil target:self selector:@selector(selectedMenuItem:)];
 		[menuItem setTag:i];
-		
+
 		[selectedItemsArr addObject:menuItem];
 	}
 	self.menuItems = [CCMenu menuWithArray:selectedItemsArr];
@@ -180,7 +176,7 @@
 	[self.menuItems glowItems];
 	[self.menuItems setTouchEnabled:YES];
 	[self.dialog addChild:self.menuItems];
-	
+
 	NSDictionary *selectedDict = [[[NSDictionary alloc] initWithDictionary:[self.parentalArr objectAtIndex:randomlySelectedItem]] autorelease];
 	NSString *selectedName = [NSString stringWithFormat:@"%@", [selectedDict objectForKey:@"name"], nil];
 	self.descriptionText = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Touch %@ \nfor 2 seconds...", selectedName, nil] fontName:@"Verdana" fontSize:FONTSIZEIPAD dimensions:CGSizeMake(0, 0) hAlignment:UITextAlignmentCenter];
@@ -192,15 +188,15 @@
 -(void)selectedMenuItem:(id)sender
 {
 	CCMenuItemImageWithTouches *selMenuItem = (CCMenuItemImageWithTouches*)sender;
-	
+
 	if (selMenuItem.didTimeOut)
 	{
 		[self.titleText runAction:[CCFadeOut actionWithDuration:OBJECTSFADEDURATION]];
 		[self.descriptionText runAction:[CCFadeOut actionWithDuration:OBJECTSFADEDURATION]];
-		
+
 		[self.menuItems removeGlowItems];
 		[self.menuItems setEnabled:NO];
-		
+
 		CCMenuItemImageWithTouches *item;
 		CCARRAY_FOREACH(self.menuItems.children, item)
 		{
@@ -232,7 +228,7 @@
 -(void)showResults
 {
 	CCMenuItemImageWithTouches *selectedItem = [self.menuItems.children objectAtIndex:0];
-	
+
 	if (selectedItem.tag == randomlySelectedItem)
 	{
 		parentPassedTest = YES;
@@ -240,26 +236,26 @@
 		[self.resultText setPosition:ccp( self.dialog.contentSize.width/2, (self.dialog.contentSize.height-titleTextY) )];
 		[self.resultText setOpacity:0];
 		[self.dialog addChild:self.resultText];
-		
+
 		[self.resultText runAction:[CCFadeIn actionWithDuration:OBJECTSFADEDURATION]];
-		
+
 		[self performSelector:@selector(closeParentalControl) withObject:nil afterDelay:kWaitingTime];
 	}
 	else
 	{
 		remainingAttempts--;
-		
+
 		if (remainingAttempts > 0)
 			self.resultText = [CCSprite spriteWithSpriteFrameName:@"parental-try-again.png"];
 		else
 			self.resultText = [CCSprite spriteWithSpriteFrameName:@"parental-bad-luck.png"];
-		
+
 		[self.resultText setPosition:ccp( self.dialog.contentSize.width/2, (self.dialog.contentSize.height-titleTextY) )];
 		[self.resultText setOpacity:0];
 		[self.dialog addChild:self.resultText];
-		
+
 		[self.resultText runAction:[CCFadeIn actionWithDuration:OBJECTSFADEDURATION]];
-		
+
 		[self performSelector:@selector(tryAgain:) withObject:nil afterDelay:kWaitingTime];
 	}
 }
@@ -291,12 +287,11 @@
 
 -(void)closeParentalControl
 {
-	[[Sounds sharedSounds] playTap];
-	
 	// A Little Hack - strange but it works!
+	// This will make sure the device doesn't power down and goes to sleep
 	[UIApplication sharedApplication].idleTimerDisabled = YES;
 	[UIApplication sharedApplication].idleTimerDisabled = NO;
-	
+
 	// in parallel, fadeout and remove self.coverLayer, self.dialog and then execute block
 	[self.dialog runAction:[CCSequence actions:
 										 [CCEaseBackIn actionWithAction:[CCScaleTo actionWithDuration:OBJECTSFADEDURATION scale:0.0]],
