@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>items</key>
+	<array>
+		<dict>
+			<key>name</key>
+			<string>Myro the Microlight</string>
+			<key>filename</key>
+			<string>myro-the-microlight.png</string>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Gigi the Gyrocopter</string>
+			<key>filename</key>
+			<string>gigi-the-gyrocopter.png</string>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>a Parrot</string>
+			<key>filename</key>
+			<string>a-parrot.png</string>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>a Sheep</string>
+			<key>filename</key>
+			<string>a-sheep.png</string>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>the Gecko</string>
+			<key>filename</key>
+			<string>the-gecko.png</string>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Madge the Manager</string>
+			<key>filename</key>
+			<string>madge-the-manager.png</string>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>a Bull</string>
+			<key>filename</key>
+			<string>a-bull.png</string>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>a Koala</string>
+			<key>filename</key>
+			<string>a-koala.png</string>
+		</dict>
+	</array>
+</dict>
+</plist>
